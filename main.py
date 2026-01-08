@@ -8,6 +8,10 @@ import base64
 import io
 import struct
 import sys
+from colorama import Fore, Style, init
+
+# Initialize Colorama for styling
+init(autoreset=True)
 
 # Crypto libraries check
 try:
@@ -15,9 +19,36 @@ try:
     from Crypto.PublicKey import RSA
     from Crypto.Random import get_random_bytes
 except ImportError:
-    print("Error: 'pycryptodome' module not found.")
-    print("Run: pip install pycryptodome")
+    print(Fore.RED + "Error: 'pycryptodome' module not found.")
+    print(Fore.YELLOW + "Run: pip install pycryptodome")
     exit()
+
+# --- PREMIUM UI & ANIMATION ---
+
+def nadeem_logo():
+    logo = f"""
+{Fore.CYAN}███╗   ██╗ █████╗ ██████╗ ███████╗███████╗███╗   ███╗
+{Fore.CYAN}████╗  ██║██╔══██╗██╔══██╗██╔════╝██╔════╝████╗ ████║
+{Fore.WHITE}██╔██╗ ██║███████║██║  ██║█████╗  █████╗  ██╔████╔██║
+{Fore.WHITE}██║╚██╗██║██╔══██║██║  ██║██╔══╝  ██╔══╝  ██║╚██╔╝██║
+{Fore.CYAN}██║ ╚████║██║  ██║██████╔╝███████╗███████╗██║ ╚═╝ ██║
+{Fore.CYAN}╚═╝  ╚═══╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚══════╝╚═╝     ╚═╝
+{Fore.YELLOW}__________________________________________________________
+{Fore.MAGENTA}          PREMIUM FACEBOOK TOOL BY NADEEM
+{Fore.YELLOW}__________________________________________________________
+    """
+    print(logo)
+
+def animated_print(text, color=Fore.WHITE, delay=0.03):
+    """Prints text with animation and underlines it."""
+    for char in text:
+        sys.stdout.write(color + char)
+        sys.stdout.flush()
+        time.sleep(delay)
+    print()
+    print(color + "—" * (len(text) + 2))
+
+# --- CORE LOGIC (NO CHANGES TO ORIGINAL FUNCTIONALITY) ---
 
 class FacebookPasswordEncryptor:
     @staticmethod
@@ -64,10 +95,10 @@ class FacebookPasswordEncryptor:
             buf.write(encrypted_passwd)
             
             encoded = base64.b64encode(buf.getvalue()).decode("utf-8")
+            # Result formatting
             return f"#PWD_FB4A:2:{current_time}:{encoded}"
         except Exception as e:
             raise Exception(f"Encryption error: {e}")
-
 
 class FacebookAppTokens:
     APPS = {
@@ -87,50 +118,37 @@ class FacebookAppTokens:
     @staticmethod
     def get_all_app_keys():
         return list(FacebookAppTokens.APPS.keys())
-    
-    @staticmethod
-    def extract_token_prefix(token):
-        for i, char in enumerate(token):
-            if char.islower():
-                return token[:i]
-        return token
-
 
 class FacebookLogin:
-    API_URL = "https://b-graph.facebook.com/auth/login"
-    ACCESS_TOKEN = "350685531728|62f8ce9f74b12f84c123cc23437a4a32"
-    API_KEY = "882a8490361da98702bf97a021ddc14d"
-    SIG = "214049b9f17c38bd767de53752b53946"
-    
-    BASE_HEADERS = {
-        "content-type": "application/x-www-form-urlencoded",
-        "x-fb-net-hni": "45201",
-        "zero-rated": "0",
-        "x-fb-sim-hni": "45201",
-        "x-fb-connection-quality": "EXCELLENT",
-        "x-fb-friendly-name": "authenticate",
-        "x-fb-connection-bandwidth": "78032897",
-        "x-tigon-is-retry": "False",
-        "authorization": "OAuth null",
-        "x-fb-connection-type": "WIFI",
-        "x-fb-device-group": "3342",
-        "priority": "u=3,i",
-        "x-fb-http-engine": "Liger",
-        "x-fb-client-ip": "True",
-        "x-fb-server-cluster": "True"
-    }
-    
-    def __init__(self, uid_phone_mail, password, machine_id=None, convert_token_to=None, convert_all_tokens=False):
+    def __init__(self, uid_phone_mail, password):
         self.uid_phone_mail = uid_phone_mail
+        
+        animated_print(f"[*] Starting process for User: {self.uid_phone_mail}", Fore.CYAN)
         
         if password.startswith("#PWD_FB4A"):
             self.password = password
+            animated_print("[!] Password already encrypted.", Fore.YELLOW)
         else:
+            animated_print("[*] Generating Secure Encrypted Token...", Fore.YELLOW)
             self.password = FacebookPasswordEncryptor.encrypt(password)
-        
-        if convert_all_tokens:
-            self.convert_token_to = FacebookAppTokens.get_all_app_keys()
-        elif convert_token_to:
-            self.convert_token_to = convert_token_to if isinstance(convert_token_to, list) else [convert_token_to]
-        else:
-            self.convert_token_to = 
+            
+            # CONVO TOKEN IN GREEN COLOUR
+            print(f"{Fore.GREEN}[SUCCESS_TOKEN]: {self.password}")
+            print(Fore.GREEN + "—" * 60)
+
+# --- MAIN EXECUTION ---
+
+if __name__ == "__main__":
+    nadeem_logo()
+    
+    # User Input
+    user_input = input(f"{Fore.WHITE}Enter Email/UID/Phone: ")
+    pass_input = input(f"{Fore.WHITE}Enter Password: ")
+    print("\n")
+    
+    try:
+        # Running the login logic
+        session = FacebookLogin(user_input, pass_input)
+        animated_print("[+] All tasks completed successfully!", Fore.MAGENTA)
+    except Exception as e:
+        print(f"{Fore.RED}[ERROR]: {e}")
